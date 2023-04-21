@@ -1,17 +1,14 @@
-const fs = require("fs");
+const fs = require("fs/promises");
 // const { pipeline } = require("stream");
 
 (async () => {
   try {
-    const readStream = fs.createReadStream("./src/dir1/test.txt", {
-      highWaterMark: 100,
-    });
-    readStream.on("data", (chunk) => {
+    const filehandle = await fs.open("./src/dir1/test.txt");
+    const readStream = filehandle.createReadStream();
+    readStream.on("data", async (chunk) => {
       console.log("chunk", chunk);
       const chunkString = chunk.toString("utf8");
-      fs.appendFile("./src/dir2/test.txt", chunkString, (error) => {
-        if (error) console.log("error", error);
-      });
+      await fs.appendFile("./src/dir2/test.txt", chunkString);
       console.log("File Appended");
     });
     readStream.on("end", () => {
