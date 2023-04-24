@@ -1,23 +1,19 @@
 const fs = require("fs/promises");
-// const { pipeline } = require("stream");
 
 (async () => {
   try {
-    const filehandle = await fs.open("./src/dir1/test.txt");
-    const readStream = filehandle.createReadStream();
+    const srcFile = "./src/dir1/test.txt";
+    const destFile = "./src/dir2/test.txt";
+    const fileHandle = await fs.open(srcFile);
+    const readStream = fileHandle.createReadStream();
     readStream.on("data", async (chunk) => {
-      console.log("chunk", chunk);
-      const chunkString = chunk.toString("utf8");
-      await fs.appendFile("./src/dir2/test.txt", chunkString);
-      console.log("File Appended");
+      await fs.appendFile(destFile, chunk.toString("utf8"));
     });
     readStream.on("end", () => {
-      fs.unlink("./src/dir1/test.txt", (error) => {
+      fs.unlink(srcFile, (error) => {
         if (error) console.log("error", error);
       });
-      console.log("Stream Ended and src file deleted");
     });
-    console.log("file wrote");
   } catch (error) {
     console.log("error", error);
   }
